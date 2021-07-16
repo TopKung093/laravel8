@@ -46,6 +46,9 @@ Route::get('/greeting', function () {
     $last_name = 'Mars';
     return view('greeting', compact('name','last_name') );
 });
+Route::get("/teacher" , function (){
+	return view("teacher");
+});
 Route::get( "/gallery" , function(){
 	$ant = "https://cdn3.movieweb.com/i/article/Oi0Q2edcVVhs4p1UivwyyseezFkHsq/1107:50/Ant-Man-3-Talks-Michael-Douglas-Update.jpg";
     $bird = "https://www.hebergementwebs.com/image/cc/cc8811773d2cdbeb4d46e5550fc455fe.jpg/falcon-and-the-winter-soldier-falcon-minifigure-captain-america.jpg";
@@ -58,13 +61,16 @@ Route::get('/gallery/ant', function () {
 	$ant = "https://cdn3.movieweb.com/i/article/Oi0Q2edcVVhs4p1UivwyyseezFkHsq/1107:50/Ant-Man-3-Talks-Michael-Douglas-Update.jpg";
     return view("test/ant", compact("ant") );
 });
-Route::get("/teacher" , function (){
-	return view("teacher");
-});
-
 Route::get("/student" , function (){
 	return view("student");
 });
 Route::get('/table', function () {
     return view('table');
 });
+use App\Http\Controllers\MyProfileController;
+Route::get("/myprofile/create",[ MyProfileController::class , "create" ]);
+Route::get("/myprofile/{id}/edit",[ MyProfileController::class , "edit" ]);
+Route::get("/myprofile/{id}", [ MyProfileController::class , "show" ]);
+Route::get( "/newgallery" , [ MyProfileController::class , "gallery" ]);
+Route::get( "/newgallery/ant" , [ MyProfileController::class , "ant" ]);
+
