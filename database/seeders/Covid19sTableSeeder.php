@@ -23,4 +23,11 @@ class Covid19sTableSeeder extends Seeder
         //mysql -u username -p password database_name < file.sql
         exec("mysql -u {$user} -p {$db} < {$path}");
     }
+    public function show($id)
+    {
+        $covid19 = Covid19::findOrFail($id);
+
+        return view('covid19.show', compact('covid19'));
+    }
+
 }
