@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -46,8 +47,11 @@ Route::get('/greeting', function () {
     $last_name = 'Mars';
     return view('greeting', compact('name','last_name') );
 });
-Route::get("/teacher" , function (){
+Route::middleware(['auth','role:admin,teacher'])->group(function () {
+    Route::get("/teacher" , function (){
 	return view("teacher");
+    });
+    Route::resource('/covid19','Covid19Controller');
 });
 Route::get( "/gallery" , function(){
 	$ant = "https://cdn3.movieweb.com/i/article/Oi0Q2edcVVhs4p1UivwyyseezFkHsq/1107:50/Ant-Man-3-Talks-Michael-Douglas-Update.jpg";
@@ -93,3 +97,9 @@ Route::delete('/staff/{id}', [ StaffController::class , 'destroy' ]);
 
 use App\Http\Controllers\PostController;
 Route::resource('post', PostController::class);
+
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth'])->name('dashboard');
+
+require __DIR__ . '/auth.php';
