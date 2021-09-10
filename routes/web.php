@@ -103,3 +103,16 @@ Route::get('/dashboard', function () {
 })->middleware(['auth'])->name('dashboard');
 
 require __DIR__ . '/auth.php';
+
+//Route::resource('post', 'PostController');
+//Route::resource('profile', 'ProfileController');
+//Route::resource('user', 'UserController');
+//Route::resource('vehicle', 'VehicleController');
+
+use App\Http\Controllers\ProfileController;  //เขียนเพิ่ม
+use App\Http\Controllers\UserController;  //เขียนเพิ่ม
+use App\Http\Controllers\VehicleController;  //เขียนเพิ่ม
+
+Route::resource('profile', ProfileController::class);
+Route::resource('user', UserController::class);
+Route::resource('vehicle', VehicleController::class);

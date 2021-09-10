@@ -2,7 +2,7 @@
 
 return [
 
-    'custom_template' => false,
+    'custom_template' => true,
     /*
     |--------------------------------------------------------------------------
     | Crud Generator Template Stubs Storage Path
