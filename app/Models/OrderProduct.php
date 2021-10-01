@@ -26,6 +26,17 @@ class OrderProduct extends Model
      * @var array
      */
     protected $fillable = ['order_id', 'product_id', 'user_id', 'quantity', 'price', 'total'];
+    public function user(){
+        return $this->belongsTo(User::class, 'user_id', 'id'); 
+    }
+
+    public function order(){
+        return $this->belongsTo(Order::class, 'order_id', 'id'); 
+    }
+
+    public function product(){
+        return $this->belongsTo(Product::class, 'product_id', 'id'); 
+    }
 
     
 }

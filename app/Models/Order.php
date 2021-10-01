@@ -26,6 +26,18 @@ class Order extends Model
      * @var array
      */
     protected $fillable = ['user_id', 'remark', 'total', 'status', 'checking_at', 'paid_at', 'cancelled_at', 'completed_at', 'tracking'];
+    public function user(){
+        return $this->belongsTo(User::class, 'user_id', 'id'); 
+    }
+    
+    public function payment(){
+        return $this->hasOne(Payment::class, 'order_id', 'id'); 
+    }
+
+    public function order_products(){
+        return $this->hasMany(OrderProduct::class, 'order_id', 'id'); 
+    }
+
 
     
 }

@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 
 use App\Models\OrderProduct;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class OrderProductController extends Controller
 {
@@ -19,19 +20,9 @@ class OrderProductController extends Controller
     {
         $keyword = $request->get('search');
         $perPage = 25;
-
-        if (!empty($keyword)) {
-            $orderproduct = OrderProduct::where('order_id', 'LIKE', "%$keyword%")
-                ->orWhere('product_id', 'LIKE', "%$keyword%")
-                ->orWhere('user_id', 'LIKE', "%$keyword%")
-                ->orWhere('quantity', 'LIKE', "%$keyword%")
-                ->orWhere('price', 'LIKE', "%$keyword%")
-                ->orWhere('total', 'LIKE', "%$keyword%")
-                ->latest()->paginate($perPage);
-        } else {
-            $orderproduct = OrderProduct::latest()->paginate($perPage);
-        }
-
+        $orderproduct = OrderProduct::whereNull('order_id')
+        ->where('user_id', Auth::id() )
+        ->latest()->paginate($perPage);
         return view('order-product.index', compact('orderproduct'));
     }
 
@@ -56,7 +47,9 @@ class OrderProductController extends Controller
     {
         
         $requestData = $request->all();
-        
+        $requestData['total'] = $requestData['quantity'] * $requestData['price'];
+        //ระบุ user_id
+        $requestData['user_id'] = Auth::id();
         OrderProduct::create($requestData);
 
         return redirect('order-product')->with('flash_message', 'OrderProduct added!');

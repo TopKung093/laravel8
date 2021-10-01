@@ -7,7 +7,9 @@ use App\Http\Controllers\Controller;
 
 use App\Models\Order;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Auth;
+use App\Models\OrderProduct;
+use App\Models\Product;
 class OrderController extends Controller
 {
     /**
@@ -59,9 +61,23 @@ class OrderController extends Controller
     {
         
         $requestData = $request->all();
-        
-        Order::create($requestData);
-
+        $total = OrderProduct::whereNull('order_id')
+            ->where('user_id', Auth::id() )->sum('total');
+        //กำหนดราคารวม, ผู้ใช้, สถานะ
+        $requestData['total'] = $total;
+        $requestData['user_id'] = Auth::id();
+        $requestData['status'] = "created";        
+        //CREATE ORDER      
+        $order = Order::create($requestData);
+        //UPDATE ORDER ID ในตาราง order_product สำหรับคอลัมน์ที่ order_id เป็น null
+        OrderProduct::whereNull('order_id')
+            ->where('user_id', Auth::id() )->update(['order_id'=> $order->id]);
+        //ปรับลดสินค้าในสต๊อก
+        $order_products = $order->order_products;
+        foreach($order_products as $item)
+        {
+            Product::where('id',$item->product_id)->decrement('quantity', $item->quantity);
+        }
         return redirect('order')->with('flash_message', 'Order added!');
     }
 
