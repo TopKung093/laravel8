@@ -1,9 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+
 
 use App\Models\Order;
 use Illuminate\Http\Request;
@@ -22,20 +22,16 @@ class OrderController extends Controller
         $keyword = $request->get('search');
         $perPage = 25;
 
-        if (!empty($keyword)) {
-            $order = Order::where('user_id', 'LIKE', "%$keyword%")
-                ->orWhere('remark', 'LIKE', "%$keyword%")
-                ->orWhere('total', 'LIKE', "%$keyword%")
-                ->orWhere('status', 'LIKE', "%$keyword%")
-                ->orWhere('checking_at', 'LIKE', "%$keyword%")
-                ->orWhere('paid_at', 'LIKE', "%$keyword%")
-                ->orWhere('cancelled_at', 'LIKE', "%$keyword%")
-                ->orWhere('completed_at', 'LIKE', "%$keyword%")
-                ->orWhere('tracking', 'LIKE', "%$keyword%")
-                ->latest()->paginate($perPage);
-        } else {
-            $order = Order::latest()->paginate($perPage);
+        switch(Auth::user()->role)
+        {
+            case "admin" : 
+                $order = Order::latest()->paginate($perPage);
+                break;
+            default : 
+                //means guest
+                $order = Order::where('user_id',Auth::id() )->latest()->paginate($perPage);            
         }
+        
 
         return view('order.index', compact('order'));
     }
@@ -49,18 +45,11 @@ class OrderController extends Controller
     {
         return view('order.create');
     }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
     public function store(Request $request)
     {
         
         $requestData = $request->all();
+        
         $total = OrderProduct::whereNull('order_id')
             ->where('user_id', Auth::id() )->sum('total');
         //กำหนดราคารวม, ผู้ใช้, สถานะ
@@ -78,9 +67,9 @@ class OrderController extends Controller
         {
             Product::where('id',$item->product_id)->decrement('quantity', $item->quantity);
         }
+
         return redirect('order')->with('flash_message', 'Order added!');
     }
-
     /**
      * Display the specified resource.
      *
@@ -123,6 +112,15 @@ class OrderController extends Controller
         $requestData = $request->all();
         
         $order = Order::findOrFail($id);
+        switch($requestData['status']){
+            case "paid" : 
+                $requestData['paid_at'] = date("Y-m-d H:i:s");
+                break;
+            case "completed" : 
+                $requestData['completed_at'] = date("Y-m-d H:i:s");
+                break;
+        }
+
         $order->update($requestData);
 
         return redirect('order')->with('flash_message', 'Order updated!');

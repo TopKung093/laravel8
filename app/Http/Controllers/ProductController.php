@@ -1,10 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\DB;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-
+use PDF;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -130,4 +130,11 @@ class ProductController extends Controller
 
         return redirect('product')->with('flash_message', 'Product deleted!');
     }
+    public function pdf_index() {
+        $data = ["a" => "...", "b" => "..."  ];
+        $pdf = PDF::loadView('test_pdf',$data);
+        return $pdf->stream('test.pdf'); //แบบนี้จะ stream มา preview
+        //return $pdf->download('test.pdf'); //แบบนี้จะดาวโหลดเลย
+   }
+   
 }
